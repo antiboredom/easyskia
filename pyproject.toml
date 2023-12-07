@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "easyskia"
+version = "0.1.0"
+description = ""
+authors = ["Sam Lavigne <splavigne@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+skia-python = "^87.5"
+glfw = "^2.6.3"
+pyopengl = "^3.1.7"
+pyopengl-accelerate = "^3.1.7"
+imageio-ffmpeg = "^0.4.9"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
