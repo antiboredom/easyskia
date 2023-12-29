@@ -1,3 +1,4 @@
+from typing import Optional
 import time
 import glfw
 import os
@@ -16,13 +17,22 @@ DEFAULT_HEIGHT = 600
 class Canvas:
     def __init__(
         self,
-        width=DEFAULT_WIDTH,
-        height=DEFAULT_HEIGHT,
-        show=False,
-        renderer="GPU",
-        title="EasySkia",
-        output=None,
+        width: int = DEFAULT_WIDTH,
+        height: int = DEFAULT_HEIGHT,
+        show: bool = False,
+        renderer: str = "GPU",
+        title: str = "EasySkia",
+        output: Optional[str] = None,
     ):
+        """Create a canvas
+        Args:
+            width (int): width of canvas
+            height (int): height of canvas
+            show (bool): show the canvas
+            renderer (str): renderer to use (GPU, CPU, PDF)
+            title (str): title of window
+            output (str): output path for PDF renderer
+        """
         self.width = width
         self.height = height
         self.show = show
@@ -66,8 +76,11 @@ class Canvas:
         self.surface = skia.Surface(self.width, self.height)
         self.canvas = self.surface.getCanvas()
 
-    def setup_pdf(self, output):
-        """Setup a PDF canvas"""
+    def setup_pdf(self, output: str):
+        """Setup a PDF canvas
+        Args:
+            output (str): output path
+        """
         self.stream = skia.FILEWStream(output)
         self.surface = skia.PDF.MakeDocument(self.stream)
         self.canvas = self.surface.beginPage(self.width, self.height)
@@ -283,7 +296,15 @@ class Canvas:
         self.render()
 
     def rect(
-        self, x: float, y: float, w: float, h: float, tl=None, tr=None, br=None, bl=None
+        self,
+        x: float,
+        y: float,
+        w: float,
+        h: float,
+        tl: Optional[float] = None,
+        tr: Optional[float] = None,
+        br: Optional[float] = None,
+        bl: Optional[float] = None,
     ):
         """Draw a rectangle
         Args:
@@ -395,7 +416,14 @@ class Canvas:
         """
         return skia.Image.open(path)
 
-    def image(self, image: skia.Image, x: float, y: float, w=None, h=None):
+    def image(
+        self,
+        image: skia.Image,
+        x: float,
+        y: float,
+        w: Optional[float] = None,
+        h: Optional[float] = None,
+    ):
         """Draw an image
         Args:
             image (skia.Image): image to draw
@@ -443,7 +471,7 @@ class Canvas:
 
         return True
 
-    def add_page(self, width=None, height=None):
+    def add_page(self, width: Optional[float] = None, height: Optional[float] = None):
         """Add a page to a PDF canvas
         Args:
             width (float): width of page
@@ -504,7 +532,7 @@ class Canvas:
         self.canvas.rotate(deg)
         return self
 
-    def scale(self, sx: float, sy=None):
+    def scale(self, sx: float, sy: Optional[float] = None):
         """Scale the canvas
         Args:
             sx (float): x scale
@@ -538,7 +566,7 @@ class Canvas:
             self.canvas.drawImage(image, 0, 0)
         return self
 
-    def save_frame(self, filename=None):
+    def save_frame(self, filename: Optional[str] = None):
         """Save a frame. If filename is None, it will be named frame_0000000000.jpg
         Args:
             filename (str): filename to save to
