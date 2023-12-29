@@ -2,7 +2,7 @@ import time
 import glfw
 import os
 import skia
-from skia import Color, Color4f, Paint, Typeface, Font, Path
+from skia import Color4f, Paint, Typeface, Font, Path
 from OpenGL import GL
 import imageio_ffmpeg
 
@@ -376,7 +376,7 @@ class Canvas:
 
     def save(self, filename="frame.png"):
         encoding = skia.kPNG
-        ext = os.path.splitext(filename)[1]
+        ext = os.path.splitext(filename)[1].lower()
         if ext == ".png":
             encoding = skia.kPNG
         elif ext == ".jpg":
@@ -399,7 +399,7 @@ class Canvas:
             filename = f"frame_{f_count}.jpg"
         else:
             parts = os.path.splitext(filename)
-            filename = "f{parts[0]_{f_count}{parts[1]}"
+            filename = f"{parts[0]}_{f_count}{parts[1]}"
         self.save(filename)
 
     def save_pdf(self):
