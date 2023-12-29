@@ -62,15 +62,18 @@ class Canvas:
             raise Exception("Invalid renderer: Pick between GPU, CPU, or PDF")
 
     def setup_raster(self):
+        """Setup a raster canvas"""
         self.surface = skia.Surface(self.width, self.height)
         self.canvas = self.surface.getCanvas()
 
     def setup_pdf(self, output):
+        """Setup a PDF canvas"""
         self.stream = skia.FILEWStream(output)
         self.surface = skia.PDF.MakeDocument(self.stream)
         self.canvas = self.surface.beginPage(self.width, self.height)
 
     def setup_gl(self):
+        """Setup a GPU canvas"""
         if not glfw.init():
             return
 
@@ -113,37 +116,78 @@ class Canvas:
 
         self.canvas.scale(self.density, self.density)
 
-    def background(self, r, g, b, a=1.0):
+    def background(self, r: float, g: float, b: float, a=1.0):
+        """
+        Set the background color
+        Args:
+            r (float): red value
+            g (float): green value
+            b (float): blue value
+            a (float): alpha value (default: 1.0)
+        """
         self.canvas.drawRect(
             skia.Rect(0, 0, self.width, self.height), paint=Paint(Color4f(r, g, b, a))
         )
 
     def clear(self):
+        """Clear the canvas"""
         self.canvas.clear(Color4f(0, 0, 0, 0))
 
-    def fill(self, r, g, b, a=1):
+    def fill(self, r: float, g: float, b: float, a: float = 1.0):
+        """Set the fill color
+        Args:
+            r (float): red value
+            g (float): green value
+            b (float): blue value
+            a (float): alpha value (default: 1.0)
+        """
         self._fill = (r, g, b, a)
 
-    def stroke(self, r, g, b, a=1):
+    def stroke(self, r: float, g: float, b: float, a: float = 1.0):
+        """Set the stroke color
+        Args:
+            r (float): red value
+            g (float): green value
+            b (float): blue value
+            a (float): alpha value (default: 1.0)
+        """
         self._stroke = (r, g, b, a)
 
-    def stroke_weight(self, w):
+    def stroke_weight(self, w: float):
+        """Set the stroke weight
+        Args:
+            w (float): stroke weight
+        """
         self._stroke_weight = w
 
     def no_fill(self):
+        """Disable fill"""
         self._fill = None
 
     def no_stroke(self):
+        """Disable stroke"""
         self._stroke_weight = 0
 
-    def text_font(self, fontname):
+    def text_font(self, fontname: str):
+        """Set the text font
+        Args:
+            fontname (str): font name
+        """
         self._text_font = Font(Typeface(fontname))
 
-    def text_size(self, size):
+    def text_size(self, size: float):
+        """Set the text size
+        Args:
+            size (float): font size
+        """
         self._text_size = size
         self._text_font.setSize(size)
 
-    def text_style(self, s):
+    def text_style(self, s: str):
+        """Set the text style
+        Args:
+            s (str): text style
+        """
         skia_font_style = None
         if s == "bold":
             skia_font_style = skia.FontStyle.Bold()
@@ -157,20 +201,32 @@ class Canvas:
             return False
 
         self._text_style = s
-        # skia.Font.
         family_name = self._text_font.getTypeface().getFamilyName()
         typeface = Typeface.MakeFromName(family_name, skia_font_style)
         self._text_font.setTypeface(typeface)
 
         return self
 
-    def line(self, path):
-        x1, y1, x2, y2 = path[0].x, path[0].y, path[1].x, path[1].y
+    def line(self, x1: float, y1: float, x2: float, y2: float):
+        """Draw a line
+        Args:
+            x1 (float): x1
+            y1 (float): y1
+            x2 (float): x2
+            y2 (float): y2
+        """
         self.path.moveTo(x1, y1)
         self.path.lineTo(x2, y2)
         self.render()
 
-    def ellipse(self, x, y, w, h):
+    def ellipse(self, x: float, y: float, w: float, h: float):
+        """Draw an ellipse
+        Args:
+            x (float): x
+            y (float): y
+            w (float): width
+            h (float): height
+        """
         kappa = 0.5522847498
         ox = w / 2 * kappa
         oy = h / 2 * kappa
@@ -187,11 +243,38 @@ class Canvas:
 
         self.render()
 
-    def circle(self, x, y, d):
+    def circle(self, x: float, y: float, d: float):
+        """Draw a circle
+        Args:
+            x (float): x
+            y (float): y
+            d (float): diameter
+        """
         self.path.addCircle(x, y, d / 2)
         self.render()
 
-    def quad(self, x1, y1, x2, y2, x3, y3, x4, y4):
+    def quad(
+        self,
+        x1: float,
+        y1: float,
+        x2: float,
+        y2: float,
+        x3: float,
+        y3: float,
+        x4: float,
+        y4: float,
+    ):
+        """Draw a quad
+        Args:
+            x1 (float): x1
+            y1 (float): y1
+            x2 (float): x2
+            y2 (float): y2
+            x3 (float): x3
+            y3 (float): y3
+            x4 (float): x4
+            y4 (float): y4
+        """
         self.path.moveTo(x1, y1)
         self.path.lineTo(x2, y2)
         self.path.lineTo(x3, y3)
@@ -199,13 +282,20 @@ class Canvas:
         self.path.close()
         self.render()
 
-    def rect(self, *args):
-        x, y, w, h = args[:4]
-        args = args[4:]
-        tl = args[0] if len(args) >= 1 else None
-        tr = args[1] if len(args) >= 2 else None
-        br = args[2] if len(args) >= 3 else None
-        bl = args[3] if len(args) >= 4 else None
+    def rect(
+        self, x: float, y: float, w: float, h: float, tl=None, tr=None, br=None, bl=None
+    ):
+        """Draw a rectangle
+        Args:
+            x (float): x
+            y (float): y
+            w (float): width
+            h (float): height
+            tl (float): top left corner radius
+            tr (float): top right corner radius
+            br (float): bottom right corner radius
+            bl (float): bottom left corner radius
+        """
 
         if tl is None:
             self.path.moveTo(x, y)
@@ -253,8 +343,18 @@ class Canvas:
 
         self.render()
 
-    def triangle(self, *args):
-        x1, y1, x2, y2, x3, y3 = args
+    def triangle(
+        self, x1: float, y1: float, x2: float, y2: float, x3: float, y3: float
+    ):
+        """Draw a triangle
+        Args:
+            x1 (float): x1
+            y1 (float): y1
+            x2 (float): x2
+            y2 (float): y2
+            x3 (float): x3
+            y3 (float): y3
+        """
         self.path.moveTo(x1, y1)
         self.path.lineTo(x2, y2)
         self.path.lineTo(x3, y3)
@@ -262,7 +362,13 @@ class Canvas:
 
         self.render()
 
-    def text(self, text, x, y):
+    def text(self, text: str, x: float, y: float):
+        """Draw text
+        Args:
+            text (str): text to draw
+            x (float): x
+            y (float): y
+        """
         if self._stroke_weight and self._stroke_weight > 0:
             self.paint.setStyle(Paint.kStroke_Style)
             self.paint.setColor(Color4f(*self._stroke))
@@ -274,19 +380,30 @@ class Canvas:
             self.paint.setColor(Color4f(*self._fill))
             self.canvas.drawSimpleText(text, x, y, self._text_font, self.paint)
 
-    def load_font(self, path):
-        """
-        path: string
-        Absolute path of the font file
-        returns: skia.Typeface
+    def load_font(self, path: str) -> skia.Typeface:
+        """Load a font
+        Args:
+            path (str): path to font file
         """
         typeface = skia.Typeface().MakeFromFile(path=path)
         return typeface
 
-    def load_image(self, path):
+    def load_image(self, path: str) -> skia.Image:
+        """Load an image
+        Args:
+            path (str): path to image file
+        """
         return skia.Image.open(path)
 
-    def image(self, image, x, y, w=None, h=None):
+    def image(self, image: skia.Image, x: float, y: float, w=None, h=None):
+        """Draw an image
+        Args:
+            image (skia.Image): image to draw
+            x (float): x
+            y (float): y
+            w (float): width
+            h (float): height
+        """
         if w is None:
             w = image.width()
         if h is None:
@@ -294,6 +411,7 @@ class Canvas:
         self.canvas.drawImageRect(image, skia.Rect(x, y, x + w, y + h))
 
     def animate(self):
+        """Animate the canvas"""
         self.frame_count += 1
 
         if self.is_recording:
@@ -326,6 +444,11 @@ class Canvas:
         return True
 
     def add_page(self, width=None, height=None):
+        """Add a page to a PDF canvas
+        Args:
+            width (float): width of page
+            height (float): height of page
+        """
         if width is None:
             width = self.width
 
@@ -336,6 +459,7 @@ class Canvas:
         self.surface.beginPage(width, height)
 
     def render(self, rewind=True):
+        """Render the shape/image/text etc to the canvas"""
         if self._fill:
             self.paint.setStyle(Paint.kFill_Style)
             self.paint.setColor(Color4f(*self._fill))
@@ -353,28 +477,49 @@ class Canvas:
             self.path.rewind()
 
     def push(self):
+        """Push the canvas state"""
         self.canvas.save()
         return self
 
     def pop(self):
+        """Pop the canvas state"""
         self.canvas.restore()
         return self
 
-    def translate(self, x, y):
+    def translate(self, x: float, y: float):
+        """Translate the canvas
+        Args:
+            x (float): x
+            y (float): y
+        """
+
         self.canvas.translate(x, y)
         return self
 
-    def rotate(self, deg):
+    def rotate(self, deg: float):
+        """Rotate the canvas
+        Args:
+            deg (float): degrees to rotate
+        """
         self.canvas.rotate(deg)
         return self
 
-    def scale(self, sx, sy=None):
+    def scale(self, sx: float, sy=None):
+        """Scale the canvas
+        Args:
+            sx (float): x scale
+            sy (float): y scale
+        """
         if sy is None:
             sy = sx
         self.canvas.scale(sx, sy)
         return self
 
-    def save(self, filename="frame.png"):
+    def save(self, filename: str = "frame.png"):
+        """Save the canvas to a file
+        Args:
+            filename (str): filename to save to
+        """
         encoding = skia.kPNG
         ext = os.path.splitext(filename)[1].lower()
         if ext == ".png":
@@ -394,6 +539,10 @@ class Canvas:
         return self
 
     def save_frame(self, filename=None):
+        """Save a frame. If filename is None, it will be named frame_0000000000.jpg
+        Args:
+            filename (str): filename to save to
+        """
         f_count = str(self.frame_count).zfill(10)
         if filename is None:
             filename = f"frame_{f_count}.jpg"
@@ -403,9 +552,18 @@ class Canvas:
         self.save(filename)
 
     def save_pdf(self):
+        """Save the PDF canvas"""
         self.surface.close()
 
-    def save_video(self, filename="sketch.mp4", fps=60, max_frames=0):
+    def save_video(
+        self, filename: str = "sketch.mp4", fps: int = 60, max_frames: int = 0
+    ):
+        """Save a video
+        Args:
+            filename (str): filename to save to
+            fps (float): frames per second
+            max_frames (int): maximum number of frames to record
+        """
         print("starting recording")
         self.total_recorded_frames = 0
         self.is_recording = True
@@ -416,10 +574,12 @@ class Canvas:
         self.writer.send(None)
 
     def save_video_frame(self):
+        """Save a video frame"""
         self.total_recorded_frames += 1
         self.writer.send(self.canvas.toarray())
 
     def finish_video(self):
+        """Finish recording a video"""
         print("stopping recording")
         self.is_recording = False
         self.writer.close()
