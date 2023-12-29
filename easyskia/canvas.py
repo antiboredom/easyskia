@@ -21,6 +21,7 @@ class Canvas:
         show=False,
         renderer="GPU",
         title="EasySkia",
+        output=None,
     ):
         self.width = width
         self.height = height
@@ -28,6 +29,7 @@ class Canvas:
         self.renderer = renderer
         self.frame_count = 0
         self.title = title
+        self.density = 1.0
 
         self.last_frame_time = 0
         self._fps = 1.0 / 60.0
@@ -36,8 +38,8 @@ class Canvas:
         self.paint.setAntiAlias(True)
         self.path = Path()
 
-        self._fill = (127, 127, 127, 255)
-        self._stroke = (0, 0, 0, 255)
+        self._fill = (0.5, 0.5, 0.5, 1)
+        self._stroke = (0, 0, 0, 1)
         self._stroke_weight = 1
 
         self._text_font = Font(Typeface())
@@ -50,12 +52,23 @@ class Canvas:
 
         if renderer == "GPU":
             self.setup_gl()
-        elif renderer == "raster":
+        elif renderer == "CPU":
             self.setup_raster()
+        elif renderer == "PDF":
+            if output is None or output.lower().endswith(".pdf") is False:
+                raise Exception("PDF renderer requires output path")
+            self.setup_pdf(output)
+        else:
+            raise Exception("Invalid renderer: Pick between GPU, CPU, or PDF")
 
     def setup_raster(self):
         self.surface = skia.Surface(self.width, self.height)
         self.canvas = self.surface.getCanvas()
+
+    def setup_pdf(self, output):
+        self.stream = skia.FILEWStream(output)
+        self.surface = skia.PDF.MakeDocument(self.stream)
+        self.canvas = self.surface.beginPage(self.width, self.height)
 
     def setup_gl(self):
         if not glfw.init():
@@ -76,6 +89,7 @@ class Canvas:
 
         context = skia.GrDirectContext.MakeGL()
         (real_width, real_height) = glfw.get_framebuffer_size(window)
+        self.density = glfw.get_window_content_scale(window)[0]
         self.width = real_width
         self.height = real_height
         backend_render_target = skia.GrBackendRenderTarget(
@@ -97,18 +111,20 @@ class Canvas:
         self.context = context
         self.canvas = surface.getCanvas()
 
-    def background(self, r, g, b, a=255):
+        self.canvas.scale(self.density, self.density)
+
+    def background(self, r, g, b, a=1.0):
         self.canvas.drawRect(
-            skia.Rect(0, 0, self.width, self.height), paint=Paint(Color(r, g, b, a))
+            skia.Rect(0, 0, self.width, self.height), paint=Paint(Color4f(r, g, b, a))
         )
 
     def clear(self):
         self.canvas.clear(Color4f(0, 0, 0, 0))
 
-    def fill(self, r, g, b, a=255):
+    def fill(self, r, g, b, a=1):
         self._fill = (r, g, b, a)
 
-    def stroke(self, r, g, b, a=255):
+    def stroke(self, r, g, b, a=1):
         self._stroke = (r, g, b, a)
 
     def stroke_weight(self, w):
@@ -174,24 +190,6 @@ class Canvas:
     def circle(self, x, y, d):
         self.path.addCircle(x, y, d / 2)
         self.render()
-
-    # def point(self, x, y):
-    #     s = self.style.stroke_color
-    #     f = self.style.fill_color
-    #     fe = self.style.fill_enabled
-    #
-    #     # configure the settings beforehand we render
-    #     # We draw an arc, and fill it to simulate a point
-    #     self.style.fill_color = s
-    #     self.style.fill_enabled = True
-    #     self.style.stroke_enabled = False
-    #
-    #     # This will render the point
-    #     self.circle(x, y, self.style.stroke_weight)
-    #
-    #     self.style.fill_color = f
-    #     self.style.fill_enabled = fe
-    #     self.style.stroke_enabled = True
 
     def quad(self, x1, y1, x2, y2, x3, y3, x4, y4):
         self.path.moveTo(x1, y1)
@@ -267,13 +265,13 @@ class Canvas:
     def text(self, text, x, y):
         if self._stroke_weight and self._stroke_weight > 0:
             self.paint.setStyle(Paint.kStroke_Style)
-            self.paint.setColor(Color(*self._stroke))
+            self.paint.setColor(Color4f(*self._stroke))
             self.paint.setStrokeWidth(self._stroke_weight)
             self.canvas.drawSimpleText(text, x, y, self._text_font, self.paint)
 
         if self._fill:
             self.paint.setStyle(Paint.kFill_Style)
-            self.paint.setColor(Color(*self._fill))
+            self.paint.setColor(Color4f(*self._fill))
             self.canvas.drawSimpleText(text, x, y, self._text_font, self.paint)
 
     def load_font(self, path):
@@ -284,6 +282,16 @@ class Canvas:
         """
         typeface = skia.Typeface().MakeFromFile(path=path)
         return typeface
+
+    def load_image(self, path):
+        return skia.Image.open(path)
+
+    def image(self, image, x, y, w=None, h=None):
+        if w is None:
+            w = image.width()
+        if h is None:
+            h = image.height()
+        self.canvas.drawImageRect(image, skia.Rect(x, y, x + w, y + h))
 
     def animate(self):
         self.frame_count += 1
@@ -317,22 +325,27 @@ class Canvas:
 
         return True
 
-    def render(self, fill=True, stroke=True, rewind=True):
-        """
-        Draw the path on current canvas using paint
-        """
-        # TODO: Check, do we really have to setColor, and setStyle on each render call
-        # TODO: Explore ways to do this, such that it works with pGraphics as well
+    def add_page(self, width=None, height=None):
+        if width is None:
+            width = self.width
+
+        if height is None:
+            height = self.height
+
+        self.surface.endPage()
+        self.surface.beginPage(width, height)
+
+    def render(self, rewind=True):
         if self._fill:
             self.paint.setStyle(Paint.kFill_Style)
-            self.paint.setColor(Color(*self._fill))
+            self.paint.setColor(Color4f(*self._fill))
             self.canvas.drawPath(self.path, self.paint)
 
         if self._stroke_weight and self._stroke_weight > 0:
             # self.paint.setStrokeCap(self.style.stroke_cap)
             # self.paint.setStrokeJoin(self.style.stroke_join)
             self.paint.setStyle(Paint.kStroke_Style)
-            self.paint.setColor(Color(*self._stroke))
+            self.paint.setColor(Color4f(*self._stroke))
             self.paint.setStrokeWidth(self._stroke_weight)
             self.canvas.drawPath(self.path, self.paint)
 
@@ -380,6 +393,18 @@ class Canvas:
             self.canvas.drawImage(image, 0, 0)
         return self
 
+    def save_frame(self, filename=None):
+        f_count = str(self.frame_count).zfill(10)
+        if filename is None:
+            filename = f"frame_{f_count}.jpg"
+        else:
+            parts = os.path.splitext(filename)
+            filename = "f{parts[0]_{f_count}{parts[1]}"
+        self.save(filename)
+
+    def save_pdf(self):
+        self.surface.close()
+
     def save_video(self, filename="sketch.mp4", fps=60, max_frames=0):
         print("starting recording")
         self.total_recorded_frames = 0
@@ -392,7 +417,6 @@ class Canvas:
 
     def save_video_frame(self):
         self.total_recorded_frames += 1
-        # snap = self.surface.makeImageSnapshot()
         self.writer.send(self.canvas.toarray())
 
     def finish_video(self):
