@@ -447,6 +447,7 @@ class Canvas:
                 self.save_video_frame()
             else:
                 self.finish_video()
+                return False
 
         if self.renderer == "GPU" and self.show:
             now = glfw.get_time()
@@ -583,9 +584,7 @@ class Canvas:
         """Save the PDF canvas"""
         self.surface.close()
 
-    def save_video(
-        self, filename: str = "sketch.mp4", fps: int = 60, max_frames: int = 0
-    ):
+    def save_video(self, filename: str = "sketch.mp4", fps: int = 60, frames: int = 0):
         """Save a video
         Args:
             filename (str): filename to save to
@@ -595,7 +594,7 @@ class Canvas:
         print("starting recording")
         self.total_recorded_frames = 0
         self.is_recording = True
-        self.max_frames = max_frames
+        self.max_frames = frames
         self.writer = imageio_ffmpeg.write_frames(
             filename, (self.width, self.height), fps=fps, pix_fmt_in="rgba"
         )

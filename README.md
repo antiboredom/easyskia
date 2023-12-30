@@ -38,8 +38,7 @@ Saving videos
 ```python
 from easyskia import Canvas
 c = Canvas(width=600, height=600, show=False)
-c.save_video("testing.mp4")
-max_frames = 200
+c.save_video("testing.mp4", frames=200)
 x = 0
 while c.animate():
     c.background(1, 1, 1)
@@ -47,9 +46,18 @@ while c.animate():
     c.stroke(0, 1, 0)
     c.ellipse(x, 100, 50, 50)
     x = x + 1
-    if c.frame_count >= max_frames:
-        break
-c.finish_video()
+```
+
+Exporting PDFs
+
+```python
+from easyskia import Canvas
+c = Canvas(width=600, height=600, renderer="PDF", output="testing.pdf")
+c.background(1, 1, 1)
+c.rect(100, 100, 120, 150)
+c.add_page()
+c.rect(200, 200, 90, 90)
+c.save_pdf()
 ```
 
 # Docs
