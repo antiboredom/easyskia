@@ -117,7 +117,7 @@ class Canvas()
 
 <a id="easyskia.canvas.Canvas.__init__"></a>
 
-#### \_\_init\_\_
+### \_\_init\_\_
 
 ```python
 def __init__(width: int = DEFAULT_WIDTH,
@@ -141,7 +141,7 @@ Create a canvas
 
 <a id="easyskia.canvas.Canvas.setup_raster"></a>
 
-#### setup\_raster
+### setup\_raster
 
 ```python
 def setup_raster()
@@ -151,7 +151,7 @@ Setup a raster canvas
 
 <a id="easyskia.canvas.Canvas.setup_pdf"></a>
 
-#### setup\_pdf
+### setup\_pdf
 
 ```python
 def setup_pdf(output: str)
@@ -165,7 +165,7 @@ Setup a PDF canvas
 
 <a id="easyskia.canvas.Canvas.setup_gl"></a>
 
-#### setup\_gl
+### setup\_gl
 
 ```python
 def setup_gl()
@@ -175,7 +175,7 @@ Setup a GPU canvas
 
 <a id="easyskia.canvas.Canvas.background"></a>
 
-#### background
+### background
 
 ```python
 def background(r: float, g: float, b: float, a=1.0)
@@ -192,7 +192,7 @@ Set the background color
 
 <a id="easyskia.canvas.Canvas.clear"></a>
 
-#### clear
+### clear
 
 ```python
 def clear()
@@ -202,7 +202,7 @@ Clear the canvas
 
 <a id="easyskia.canvas.Canvas.fill"></a>
 
-#### fill
+### fill
 
 ```python
 def fill(r: float, g: float, b: float, a: float = 1.0)
@@ -219,7 +219,7 @@ Set the fill color
 
 <a id="easyskia.canvas.Canvas.stroke"></a>
 
-#### stroke
+### stroke
 
 ```python
 def stroke(r: float, g: float, b: float, a: float = 1.0)
@@ -236,7 +236,7 @@ Set the stroke color
 
 <a id="easyskia.canvas.Canvas.stroke_weight"></a>
 
-#### stroke\_weight
+### stroke\_weight
 
 ```python
 def stroke_weight(w: float)
@@ -250,7 +250,7 @@ Set the stroke weight
 
 <a id="easyskia.canvas.Canvas.no_fill"></a>
 
-#### no\_fill
+### no\_fill
 
 ```python
 def no_fill()
@@ -260,7 +260,7 @@ Disable fill
 
 <a id="easyskia.canvas.Canvas.no_stroke"></a>
 
-#### no\_stroke
+### no\_stroke
 
 ```python
 def no_stroke()
@@ -270,7 +270,7 @@ Disable stroke
 
 <a id="easyskia.canvas.Canvas.text_font"></a>
 
-#### text\_font
+### text\_font
 
 ```python
 def text_font(fontname: str)
@@ -284,7 +284,7 @@ Set the text font
 
 <a id="easyskia.canvas.Canvas.text_size"></a>
 
-#### text\_size
+### text\_size
 
 ```python
 def text_size(size: float)
@@ -298,7 +298,7 @@ Set the text size
 
 <a id="easyskia.canvas.Canvas.text_style"></a>
 
-#### text\_style
+### text\_style
 
 ```python
 def text_style(s: str)
@@ -312,7 +312,7 @@ Set the text style
 
 <a id="easyskia.canvas.Canvas.line"></a>
 
-#### line
+### line
 
 ```python
 def line(x1: float, y1: float, x2: float, y2: float)
@@ -329,7 +329,7 @@ Draw a line
 
 <a id="easyskia.canvas.Canvas.ellipse"></a>
 
-#### ellipse
+### ellipse
 
 ```python
 def ellipse(x: float, y: float, w: float, h: float)
@@ -346,7 +346,7 @@ Draw an ellipse
 
 <a id="easyskia.canvas.Canvas.circle"></a>
 
-#### circle
+### circle
 
 ```python
 def circle(x: float, y: float, d: float)
@@ -362,7 +362,7 @@ Draw a circle
 
 <a id="easyskia.canvas.Canvas.quad"></a>
 
-#### quad
+### quad
 
 ```python
 def quad(x1: float, y1: float, x2: float, y2: float, x3: float, y3: float,
@@ -384,7 +384,7 @@ Draw a quad
 
 <a id="easyskia.canvas.Canvas.rect"></a>
 
-#### rect
+### rect
 
 ```python
 def rect(x: float,
@@ -412,7 +412,7 @@ Draw a rectangle
 
 <a id="easyskia.canvas.Canvas.triangle"></a>
 
-#### triangle
+### triangle
 
 ```python
 def triangle(x1: float, y1: float, x2: float, y2: float, x3: float, y3: float)
@@ -431,7 +431,7 @@ Draw a triangle
 
 <a id="easyskia.canvas.Canvas.text"></a>
 
-#### text
+### text
 
 ```python
 def text(text: str, x: float, y: float)
@@ -447,7 +447,7 @@ Draw text
 
 <a id="easyskia.canvas.Canvas.load_font"></a>
 
-#### load\_font
+### load\_font
 
 ```python
 def load_font(path: str) -> skia.Typeface
@@ -461,7 +461,7 @@ Load a font
 
 <a id="easyskia.canvas.Canvas.load_image"></a>
 
-#### load\_image
+### load\_image
 
 ```python
 def load_image(path: str) -> skia.Image
@@ -475,7 +475,7 @@ Load an image
 
 <a id="easyskia.canvas.Canvas.image"></a>
 
-#### image
+### image
 
 ```python
 def image(image: skia.Image,
@@ -497,7 +497,7 @@ Draw an image
 
 <a id="easyskia.canvas.Canvas.animate"></a>
 
-#### animate
+### animate
 
 ```python
 def animate()
@@ -507,7 +507,7 @@ Animate the canvas
 
 <a id="easyskia.canvas.Canvas.add_page"></a>
 
-#### add\_page
+### add\_page
 
 ```python
 def add_page(width: Optional[float] = None, height: Optional[float] = None)
@@ -522,7 +522,7 @@ Add a page to a PDF canvas
 
 <a id="easyskia.canvas.Canvas.render"></a>
 
-#### render
+### render
 
 ```python
 def render(rewind=True)
@@ -532,7 +532,7 @@ Render the shape/image/text etc to the canvas
 
 <a id="easyskia.canvas.Canvas.push"></a>
 
-#### push
+### push
 
 ```python
 def push()
@@ -542,7 +542,7 @@ Push the canvas state
 
 <a id="easyskia.canvas.Canvas.pop"></a>
 
-#### pop
+### pop
 
 ```python
 def pop()
@@ -552,7 +552,7 @@ Pop the canvas state
 
 <a id="easyskia.canvas.Canvas.translate"></a>
 
-#### translate
+### translate
 
 ```python
 def translate(x: float, y: float)
@@ -567,7 +567,7 @@ Translate the canvas
 
 <a id="easyskia.canvas.Canvas.rotate"></a>
 
-#### rotate
+### rotate
 
 ```python
 def rotate(deg: float)
@@ -581,7 +581,7 @@ Rotate the canvas
 
 <a id="easyskia.canvas.Canvas.scale"></a>
 
-#### scale
+### scale
 
 ```python
 def scale(sx: float, sy: Optional[float] = None)
@@ -596,7 +596,7 @@ Scale the canvas
 
 <a id="easyskia.canvas.Canvas.save"></a>
 
-#### save
+### save
 
 ```python
 def save(filename: str = "frame.png")
@@ -610,7 +610,7 @@ Save the canvas to a file
 
 <a id="easyskia.canvas.Canvas.save_frame"></a>
 
-#### save\_frame
+### save\_frame
 
 ```python
 def save_frame(filename: Optional[str] = None)
@@ -624,7 +624,7 @@ Save a frame. If filename is None, it will be named frame_0000000000.jpg
 
 <a id="easyskia.canvas.Canvas.save_pdf"></a>
 
-#### save\_pdf
+### save\_pdf
 
 ```python
 def save_pdf()
@@ -634,7 +634,7 @@ Save the PDF canvas
 
 <a id="easyskia.canvas.Canvas.save_video"></a>
 
-#### save\_video
+### save\_video
 
 ```python
 def save_video(filename: str = "sketch.mp4",
@@ -652,7 +652,7 @@ Save a video
 
 <a id="easyskia.canvas.Canvas.save_video_frame"></a>
 
-#### save\_video\_frame
+### save\_video\_frame
 
 ```python
 def save_video_frame()
@@ -662,7 +662,7 @@ Save a video frame
 
 <a id="easyskia.canvas.Canvas.finish_video"></a>
 
-#### finish\_video
+### finish\_video
 
 ```python
 def finish_video()
