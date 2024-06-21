@@ -51,6 +51,7 @@ class Canvas:
         self._fill = (0.5, 0.5, 0.5, 1)
         self._stroke = (0, 0, 0, 1)
         self._stroke_weight = 1
+        self._alphaf = 1.0
 
         self._text_font = Font(Typeface())
         self._text_size = 16
@@ -155,6 +156,9 @@ class Canvas:
             a (float): alpha value (default: 1.0)
         """
         self._fill = (r, g, b, a)
+
+    def alpha(self, a: float):
+        self._alphaf = a
 
     def stroke(self, r: float, g: float, b: float, a: float = 1.0):
         """Set the stroke color
@@ -436,7 +440,14 @@ class Canvas:
             w = image.width()
         if h is None:
             h = image.height()
-        self.canvas.drawImageRect(image, skia.Rect(x, y, x + w, y + h))
+
+        if self._alphaf < 1.0:
+            self.paint.setAlphaf(self._alphaf)
+            self.canvas.drawImageRect(
+                image, skia.Rect(x, y, x + w, y + h), paint=self.paint
+            )
+        else:
+            self.canvas.drawImageRect(image, skia.Rect(x, y, x + w, y + h))
 
     def animate(self):
         """Animate the canvas"""
