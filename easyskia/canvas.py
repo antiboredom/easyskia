@@ -158,6 +158,9 @@ class Canvas:
         self._fill = (r, g, b, a)
 
     def alpha(self, a: float):
+        """Set the alpha value of images drawn to the canvas
+        Args:
+            a (float): alpha value"""
         self._alphaf = a
 
     def stroke(self, r: float, g: float, b: float, a: float = 1.0):
