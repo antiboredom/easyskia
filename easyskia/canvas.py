@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Literal
 import time
 import glfw
 import os
@@ -10,6 +10,7 @@ import imageio_ffmpeg
 
 DEFAULT_WIDTH = 600
 DEFAULT_HEIGHT = 600
+DEFAULT_TITLE = "Sketch"
 
 # NOTE: many of these functions are borrowed from p5py's skia renderer
 
@@ -20,8 +21,8 @@ class Canvas:
         width: int = DEFAULT_WIDTH,
         height: int = DEFAULT_HEIGHT,
         show: bool = False,
-        renderer: str = "GPU",
-        title: str = "EasySkia",
+        renderer: Literal["GPU", "CPU", "PDF"] = "GPU",
+        title: str = DEFAULT_TITLE,
         output: Optional[str] = None,
     ):
         """Create a canvas
@@ -70,7 +71,7 @@ class Canvas:
                 raise Exception("PDF renderer requires output path")
             self.setup_pdf(output)
         else:
-            raise Exception("Invalid renderer: Pick between GPU, CPU, or PDF")
+            raise Exception("Invalid renderer: Pick between 'GPU', 'CPU', or 'PDF'")
 
     def setup_raster(self):
         """Setup a raster canvas"""
@@ -203,10 +204,10 @@ class Canvas:
         self._text_size = size
         self._text_font.setSize(size)
 
-    def text_style(self, s: str):
+    def text_style(self, s: Literal["bold", "bolditalic", "italic", "normal"]):
         """Set the text style
         Args:
-            s (str): text style
+            s (str): text style (bold, bolditalic, italic, normal)
         """
         skia_font_style = None
         if s == "bold":
@@ -214,7 +215,7 @@ class Canvas:
         elif s == "bolditalic":
             skia_font_style = skia.FontStyle.BoldItalic()
         elif s == "italic":
-            skia_font_style = skia.FontStyle.BoldItalic()
+            skia_font_style = skia.FontStyle.Italic()
         elif s == "normal":
             skia_font_style = skia.FontStyle.Normal()
         else:
@@ -436,9 +437,10 @@ class Canvas:
             image (skia.Image): image to draw
             x (float): x
             y (float): y
-            w (float): width
-            h (float): height
+            w (Optional[float]): width
+            h (Optional[float]): height
         """
+
         if w is None:
             w = image.width()
         if h is None:
@@ -447,10 +449,12 @@ class Canvas:
         if self._alphaf < 1.0:
             self.paint.setAlphaf(self._alphaf)
             self.canvas.drawImageRect(
-                image, skia.Rect(x, y, x + w, y + h), paint=self.paint
+                image,
+                skia.Rect(x, y, x + w, y + h),  # type: ignore
+                paint=self.paint,
             )
         else:
-            self.canvas.drawImageRect(image, skia.Rect(x, y, x + w, y + h))
+            self.canvas.drawImageRect(image, skia.Rect(x, y, x + w, y + h))  # type: ignore
 
     def animate(self):
         """Animate the canvas"""
