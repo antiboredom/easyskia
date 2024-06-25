@@ -248,6 +248,8 @@ class Canvas:
             w (float): width
             h (float): height
         """
+        # TODO: Switch to built in oval method
+
         kappa = 0.5522847498
         ox = w / 2 * kappa
         oy = h / 2 * kappa
@@ -326,6 +328,8 @@ class Canvas:
             bl (float): bottom left corner radius
         """
 
+        # TODO: make it more "skia-ish" and have sep func for rounded rect?
+
         if tl is None:
             self.path.moveTo(x, y)
             self.path.lineTo(x + w, y)
@@ -390,6 +394,18 @@ class Canvas:
         self.path.close()
 
         self.render()
+
+    def arc(self):
+        # TODO: implement
+        raise NotImplementedError
+
+    def polygon(self):
+        # TODO: implement with addPoly
+        raise NotImplementedError
+
+    def create_path(self):
+        # TODO: implement
+        raise NotImplementedError
 
     def text(self, text: str, x: float, y: float):
         """Draw text
@@ -602,19 +618,33 @@ class Canvas:
         """Save the PDF canvas"""
         self.surface.close()
 
-    def save_video(self, filename: str = "sketch.mp4", fps: int = 60, frames: int = 0):
+    def save_video(
+        self,
+        filename: str = "sketch.mp4",
+        fps: int = 60,
+        frames: int = 0,
+        input_params: Optional[list[str]] = None,
+        output_params: Optional[list[str]] = None,
+    ):
         """Save a video
         Args:
             filename (str): filename to save to
             fps (float): frames per second
-            max_frames (int): maximum number of frames to record
+            frames (int): maximum number of frames to record
+            input_params (Optional[list]): Additional ffmpeg input command line parameters.
+            output_params (Optional[list]): Additional ffmpeg output command line parameters.
         """
         print("starting recording")
         self.total_recorded_frames = 0
         self.is_recording = True
         self.max_frames = frames
         self.writer = imageio_ffmpeg.write_frames(
-            filename, (self.width, self.height), fps=fps, pix_fmt_in="rgba"
+            filename,
+            (self.width, self.height),
+            fps=fps,
+            pix_fmt_in="rgba",
+            input_params=input_params,
+            output_params=output_params,
         )
         self.writer.send(None)
 
