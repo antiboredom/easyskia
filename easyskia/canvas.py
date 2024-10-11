@@ -97,7 +97,16 @@ class Canvas:
 
         glfw.window_hint(glfw.STENCIL_BITS, 8)  # why do i need this?
 
+        monitor = glfw.get_primary_monitor()
+        mode = glfw.get_video_mode(monitor)
+
+        self.screen_width = mode.size.width
+        self.screen_height = mode.size.height
+        self.glfw_monitor = monitor
+        self.glfw_mode = mode
+
         window = glfw.create_window(self.width, self.height, self.title, None, None)
+        glfw.set_window_size_callback(window, self.resize_cb)
 
         if not window:
             glfw.terminate()
@@ -129,6 +138,34 @@ class Canvas:
         self.context = context
         self.canvas = surface.getCanvas()
 
+        self.canvas.scale(self.density, self.density)
+
+    def resize_cb(self, window, w, h):
+        (real_width, real_height) = glfw.get_framebuffer_size(window)
+        self.density = glfw.get_window_content_scale(window)[0]
+        self.width = real_width
+        self.height = real_height
+
+        self.context.abandonContext()
+
+        backend_render_target = skia.GrBackendRenderTarget(
+            real_width,
+            real_height,
+            0,  # sampleCnt
+            0,  # stencilBits
+            skia.GrGLFramebufferInfo(0, GL.GL_RGBA8),
+        )
+        context = skia.GrDirectContext.MakeGL()
+        surface = skia.Surface.MakeFromBackendRenderTarget(
+            context,
+            backend_render_target,
+            skia.kBottomLeft_GrSurfaceOrigin,
+            skia.kRGBA_8888_ColorType,
+            skia.ColorSpace.MakeSRGB(),
+        )
+        self.surface = surface
+        self.context = context
+        self.canvas = surface.getCanvas()
         self.canvas.scale(self.density, self.density)
 
     def background(self, r: float, g: float, b: float, a=1.0):
@@ -414,16 +451,20 @@ class Canvas:
             x (float): x
             y (float): y
         """
-        if self._stroke_weight and self._stroke_weight > 0:
-            self.paint.setStyle(Paint.kStroke_Style)
-            self.paint.setColor(Color4f(*self._stroke))
-            self.paint.setStrokeWidth(self._stroke_weight)
-            self.canvas.drawSimpleText(text, x, y, self._text_font, self.paint)
+        text_height = self._text_font.getSize()
+        starty = y
+        for line in text.split("\n"):
+            if self._stroke_weight and self._stroke_weight > 0:
+                self.paint.setStyle(Paint.kStroke_Style)
+                self.paint.setColor(Color4f(*self._stroke))
+                self.paint.setStrokeWidth(self._stroke_weight)
+                self.canvas.drawSimpleText(line, x, starty, self._text_font, self.paint)
 
-        if self._fill:
-            self.paint.setStyle(Paint.kFill_Style)
-            self.paint.setColor(Color4f(*self._fill))
-            self.canvas.drawSimpleText(text, x, y, self._text_font, self.paint)
+            if self._fill:
+                self.paint.setStyle(Paint.kFill_Style)
+                self.paint.setColor(Color4f(*self._fill))
+                self.canvas.drawSimpleText(line, x, starty, self._text_font, self.paint)
+            starty += text_height
 
     def load_font(self, path: str) -> skia.Typeface:
         """Load a font
