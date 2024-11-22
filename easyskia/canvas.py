@@ -490,6 +490,9 @@ class Canvas:
         h: Optional[float] = None,
     ):
         """Draw an image
+
+        If w and h are None, the image will be drawn at its original size. If only w or only h is None, the image will be drawn based on the given dimension, maintaining its aspect ratio.
+
         Args:
             image (skia.Image): image to draw
             x (float): x
@@ -498,10 +501,13 @@ class Canvas:
             h (Optional[float]): height
         """
 
-        if w is None:
+        if w is None and h is None:
             w = image.width()
-        if h is None:
             h = image.height()
+        elif w is None and h is not None:
+            w = image.width() * (h / image.height())
+        elif h is None and w is not None:
+            h = image.height() * (w / image.width())
 
         if self._alphaf < 1.0:
             self.paint.setAlphaf(self._alphaf)
