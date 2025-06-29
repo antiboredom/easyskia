@@ -466,6 +466,16 @@ class Canvas:
                 self.canvas.drawSimpleText(line, x, starty, self._text_font, self.paint)
             starty += text_height
 
+    def text_box(self, text: str, x: float, y: float, w: float | None, h: float | None):
+        """Draw text in a box.
+        Args:
+            text (str): text to draw
+            x (float): x
+            y (float): y
+            w (float|None): width
+            h (float|None): height
+        """
+
     def load_font(self, path: str) -> skia.Typeface:
         """Load a font
         Args:
